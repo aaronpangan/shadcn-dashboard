@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
+import { ThemeProvider } from "next-themes";
+import dynamic from "next/dynamic";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+
+// Temporary solution to avoid hydration mismatch in mode toggle
+const ModeToggle = dynamic(
+  () => import("../components/ui/mode-toggle").then((mod) => mod.ModeToggle),
+  { ssr: !!false },
+);
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -19,8 +27,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${poppins.variable} antialiased`}>{children}</body>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className={`${poppins.variable} antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <div className="fixed top-5 right-8 z-50">
+            <ModeToggle />
+          </div>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
