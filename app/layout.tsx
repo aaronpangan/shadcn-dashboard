@@ -6,7 +6,7 @@ import "./globals.css";
 
 // Temporary solution to avoid hydration mismatch in mode toggle
 const ModeToggle = dynamic(
-  () => import("../components/ui/mode-toggle").then((mod) => mod.ModeToggle),
+  () => import("../components/mode-toggle").then((mod) => mod.ModeToggle),
   { ssr: !!false },
 );
 
