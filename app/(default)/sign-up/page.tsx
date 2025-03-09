@@ -24,29 +24,27 @@ import {
 } from "../../../components/ui/form";
 import { Input } from "../../../components/ui/input";
 
-const loginFormSchema = z.object({
+const SignUpFormSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(6),
 });
 
-export default function LoginPage() {
-  const form = useForm<z.infer<typeof loginFormSchema>>({
-    resolver: zodResolver(loginFormSchema),
+export default function SignUpPage() {
+  const form = useForm<z.infer<typeof SignUpFormSchema>>({
+    resolver: zodResolver(SignUpFormSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof loginFormSchema>) {
+  function onSubmit(values: z.infer<typeof SignUpFormSchema>) {
     console.log(values.email);
   }
 
   return (
     <Card className="w-[350px]">
       <CardHeader>
-        <CardTitle>Log in to your account</CardTitle>
-        <CardDescription>Enter your credentials</CardDescription>
+        <CardTitle>Sign Up</CardTitle>
+        <CardDescription>Create your credentials</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -71,34 +69,13 @@ export default function LoginPage() {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Pasword</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Enter Password"
-                      {...field}
-                    />
-                  </FormControl>
-
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit">Login</Button>
+            <Button type="submit">Sign Up</Button>
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Link className="" href="#">
-          Forgot Password
-        </Link>
+      <CardFooter className="flex justify-end">
         <Button variant={"secondary"} asChild>
-          <Link href="/sign-up">Sign Up</Link>
+          <Link href="/login">Log In</Link>
         </Button>
       </CardFooter>
     </Card>
