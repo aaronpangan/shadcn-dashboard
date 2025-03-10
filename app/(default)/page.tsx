@@ -1,4 +1,5 @@
 import { Rocket } from "lucide-react";
+import Link from "next/link";
 import { Button } from "../../components/ui/button";
 export default function LandingPage() {
   return (
@@ -10,10 +11,13 @@ export default function LandingPage() {
         Lorem ipsum, dolor sit amet consectetur adipisicing elit. Soluta,
         tenetur.
       </p>
-      <div className="flex gap-2 items-center">
-        <Button>Log In</Button>
-        <Button variant={"outline"}>Sign Up</Button>
-        
+      <div className="flex items-center gap-2">
+        <Button asChild>
+          <Link href="/login">Log In</Link>
+        </Button>
+        <Button variant={"outline"} asChild>
+          <Link href="/sign-up">Sign Up</Link>
+        </Button>
       </div>
     </>
   );
