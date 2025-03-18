@@ -1,10 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../../../components/ui/button";
+import { Calendar } from "../../../components/ui/calendar";
 import {
   Card,
   CardContent,
@@ -24,27 +27,72 @@ import {
 } from "../../../components/ui/form";
 import { Input } from "../../../components/ui/input";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../../../components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "../../../components/ui/tooltip";
+import { cn } from "../../../lib/utils";
 
-const SignUpFormSchema = z.object({
-  email: z.string().email(),
-});
+const SignUpFormSchema = z
+  .object({
+    email: z.string().email(),
+    accountType: z.enum(["personal", "company"]),
+    companyName: z.string().optional(),
+    companySize: z
+      .enum(["1-10", "11-50", "50-500", "501-1000", "1000+"])
+      .optional(),
+    dateOfBirth: z.date(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.accountType === "company" && !data.companyName) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["companyName"],
+        message: "Company Name is required",
+      });
+    }
+
+    if (data.accountType === "company" && !data.companySize) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["companySize"],
+        message: "Company Size is required",
+      });
+    }
+  });
 
 export default function SignUpPage() {
   const form = useForm<z.infer<typeof SignUpFormSchema>>({
     resolver: zodResolver(SignUpFormSchema),
     defaultValues: {
       email: "",
+      // You might want to add a default value or leave it undefined
+      // dateOfBirth: undefined,
     },
   });
 
+  const MINIMUM_DATE = new Date();
+  MINIMUM_DATE.setFullYear(new Date().getFullYear() - 120);
+
   function onSubmit(values: z.infer<typeof SignUpFormSchema>) {
-    console.log(values.email);
+    console.log(values);
   }
+
+  const watchAccountType = form.watch("accountType");
 
   return (
     <Card className="w-[350px]">
@@ -75,6 +123,151 @@ export default function SignUpPage() {
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="dateOfBirth"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Date of Birth</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value ? (
+                            <span className="capitalize">
+                              {format(field.value, "PPP")}
+                            </span>
+                          ) : (
+                            <span className="capitalize">
+                              Select your date of birth
+                            </span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        defaultMonth={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        weekStartsOn={1}
+                        initialFocus
+                        fixedWeeks
+                        fromDate={MINIMUM_DATE}
+                        toDate={new Date()}
+                        captionLayout="dropdown"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    Your date of birth is used for verification.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="accountType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Account Type</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select account type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="personal">Personal</SelectItem>
+                        <SelectItem value="company">Company</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {watchAccountType === "company" && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="companyName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Company Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Enter Company Name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="companySize"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Company Size</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select company size" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="1-10">1-10 employees</SelectItem>
+                            <SelectItem value="11-50">
+                              11-50 employees
+                            </SelectItem>
+                            <SelectItem value="50-500">
+                              50-500 employees
+                            </SelectItem>
+                            <SelectItem value="501-1000">
+                              501-1000 employees
+                            </SelectItem>
+                            <SelectItem value="1000+">
+                              1,000+ employees
+                            </SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        How many employees work at your company?
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
+
             <Button type="submit">Sign Up</Button>
           </form>
         </Form>
@@ -86,7 +279,7 @@ export default function SignUpPage() {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background text-muted-foreground px-2">
-              Or register with
+              Or continue with
             </span>
           </div>
         </div>
