@@ -2,12 +2,15 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../../../components/ui/button";
 import { Calendar } from "../../../components/ui/calendar";
+import { Checkbox } from "../../../components/ui/checkbox";
+
 import {
   Card,
   CardContent,
@@ -56,6 +59,13 @@ const SignUpFormSchema = z
       .enum(["1-10", "11-50", "50-500", "501-1000", "1000+"])
       .optional(),
     dateOfBirth: z.date(),
+    password: z.string().min(8),
+    confirm_password: z.string(),
+    isTermsAccepted: z.boolean(),
+  })
+  .refine((data) => data.password === data.confirm_password, {
+    message: "Passwords do not match",
+    path: ["confirm_password"], // This tells Zod to attach the error to the confirm_password field
   })
   .superRefine((data, ctx) => {
     if (data.accountType === "company" && !data.companyName) {
@@ -80,8 +90,10 @@ export default function SignUpPage() {
     resolver: zodResolver(SignUpFormSchema),
     defaultValues: {
       email: "",
-      // You might want to add a default value or leave it undefined
-      // dateOfBirth: undefined,
+      companyName: "",
+      password: "",
+      confirm_password: "",
+      isTermsAccepted: false,
     },
   });
 
@@ -92,7 +104,10 @@ export default function SignUpPage() {
     console.log(values);
   }
 
+  const [showPassword, setShowPassword] = React.useState(false);
+
   const watchAccountType = form.watch("accountType");
+  const watchIsTermsAccepted = form.watch("isTermsAccepted");
 
   return (
     <Card className="w-[350px]">
@@ -268,7 +283,108 @@ export default function SignUpPage() {
               </>
             )}
 
-            <Button type="submit">Sign Up</Button>
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter Password"
+                        {...field}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-0 right-0 h-full px-3 py-2"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOffIcon className="h-4 w-4" />
+                        ) : (
+                          <EyeIcon className="h-4 w-4" />
+                        )}
+                        <span className="sr-only">
+                          {showPassword ? "Hide password" : "Show password"}
+                        </span>
+                      </Button>
+                    </div>
+                  </FormControl>
+                  <FormDescription>
+                    Password must be at least 8 characters long.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="confirm_password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Confirm Password"
+                        {...field}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-0 right-0 h-full px-3 py-2"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOffIcon className="h-4 w-4" />
+                        ) : (
+                          <EyeIcon className="h-4 w-4" />
+                        )}
+                        <span className="sr-only">
+                          {showPassword ? "Hide password" : "Show password"}
+                        </span>
+                      </Button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="isTermsAccepted"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className="flex items-center">
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                      <FormDescription className="ml-2">
+                        I accept to the{" "}
+                        <Link href="/terms" className="text-primary underline">
+                          Terms of Service
+                        </Link>
+                      </FormDescription>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button disabled={!watchIsTermsAccepted} type="submit">
+              Sign Up
+            </Button>
           </form>
         </Form>
       </CardContent>
