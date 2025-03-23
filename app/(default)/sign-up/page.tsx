@@ -11,6 +11,7 @@ import { Button } from "../../../components/ui/button";
 import { Calendar } from "../../../components/ui/calendar";
 import { Checkbox } from "../../../components/ui/checkbox";
 
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -96,12 +97,13 @@ export default function SignUpPage() {
       isTermsAccepted: false,
     },
   });
+  const router = useRouter();
 
   const MINIMUM_DATE = new Date();
   MINIMUM_DATE.setFullYear(new Date().getFullYear() - 120);
 
   function onSubmit(values: z.infer<typeof SignUpFormSchema>) {
-    console.log(values);
+    router.push("/dashboard");
   }
 
   const [showPassword, setShowPassword] = React.useState(false);

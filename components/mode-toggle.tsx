@@ -16,10 +16,10 @@ export function ModeToggle() {
 
   return (
     <div onClick={toggleTheme}>
-      {theme === "dark" ? (
-        <SunIcon className={sunClassName} />
-      ) : (
+      {theme === "light" ? (
         <MoonIcon className={moonClassName} />
+      ) : (
+        <SunIcon className={sunClassName} />
       )}
     </div>
   );
