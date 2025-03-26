@@ -23,7 +23,7 @@ const navigationItems = [
   },
 ];
 
-export default function Menu() {
+export default function MenuItems() {
   const pathname = usePathname();
 
   return (
@@ -33,12 +33,12 @@ export default function Menu() {
           return (
             <li
               key={item.url}
-              className={`p-2 rounded-md text-foreground ${pathname === item.url ? "bg-primary text-primary-foreground" : "hover:bg-primary/20"}`}
+              className={`text-foreground rounded-md p-2 ${pathname === item.url ? "bg-primary text-primary-foreground" : "hover:bg-primary/20"}`}
             >
               <Link href={item.url}>{item.label}</Link>
             </li>
           );
-        })}     
+        })}
       </ul>
     </>
   );

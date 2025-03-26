@@ -1,3 +1,4 @@
+import Hamburger from "../../components/Hamburger";
 import SideBar from "../../components/Sidebar";
 
 type LayoutProps = {
@@ -11,10 +12,14 @@ export default function DashboardLayout({ children }: LayoutProps) {
       <SideBar />
       {/* Main Page */}
 
-      <div className="overflow-auto p-4">
-        <h4 className="block sm:hidden">Shadcn Dashboard</h4>
+      <div className="relative overflow-auto p-4">
+        <Hamburger
+          height={35}
+          width={35}
+          className="absolute top-6 right-6 sm:hidden"
+        />
 
-        <h1>Hello World</h1>
+        <h4 className="block sm:hidden">Shadcn Dashboard</h4>
 
         {children}
       </div>
