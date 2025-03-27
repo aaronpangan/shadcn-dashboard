@@ -35,7 +35,7 @@ export function EmployeeDialogTrigger() {
     <EmployeeDialog
       trigger={
         <DialogTrigger asChild>
-          <Button variant="outline">View</Button>
+          <Button size="sm" variant="outline">View</Button>
         </DialogTrigger>
       }
     />

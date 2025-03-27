@@ -2,6 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DepartmentCards from "../../components/DepartmentCards";
+import DepartmentDistributionChart from "../../components/DepartmentChart";
 import EmployeeCards from "../../components/EmployeeCards";
 
 export default function DashboardPage() {
@@ -21,6 +22,8 @@ export default function DashboardPage() {
           <DepartmentCards />
         </TabsContent>
       </Tabs>
+
+      <DepartmentDistributionChart />
     </div>
   );
 }
